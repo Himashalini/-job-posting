@@ -1,0 +1,280 @@
+You are helping me with a full‑stack web application that is already mostly complete.
+This is the full context of what has been built and decided so far.
+
+PROJECT TYPE
+- Job listing + shopping + reselling + affiliate‑ready website
+- Google AdSense–focused (compliance is critical)
+- Clean, professional, admin‑style UI
+
+TECH STACK
+- Frontend: React (functional components, hooks)
+- Backend: Node.js + Express
+- Database: MySQL
+- Styling: Plain CSS (no Tailwind), carefully scoped to avoid conflicts
+- Icons: react-icons
+- Hosting: Planned free tier (Netlify/Vercel + Render/Railway)
+
+CORE FEATURES BUILT
+1. HEADER
+- Responsive header with hamburger menu
+- Admin-style dark theme (#1e293b)
+- Active route highlighting
+- Mobile-friendly navigation
+- Sticky at top
+- No CSS conflicts with admin pages
+
+2. FOOTER
+- Admin-style dark footer
+- Icons-only layout (Instagram, YouTube, WhatsApp, Email)
+- Sections: Job Updates, Partner Picks, Contact, Legal
+- Disclosure text included:
+  “Some links may be partner links. We may earn a commission at no extra cost to you.”
+- Fully isolated CSS using unique class names
+- Responsive grid:
+  - Desktop: 4 columns
+  - Tablet: 2 columns
+  - Mobile: 1 column
+- Footer always sticks to bottom
+- Google AdSense compliant
+
+3. JOBS PAGE (Private Jobs)
+- Search functionality
+- Job cards grid
+- Apply button centered
+- Fully isolated CSS (no global .page or .grid)
+- Responsive for all screen sizes
+
+4. GOVERNMENT JOBS PAGE
+- Search support
+- Cards showing department, qualification, age, salary, dates
+- Notification PDF button
+- Toast error handling
+- Fully isolated CSS
+- Responsive layout
+
+5. DRESSES PAGE
+- Reselling (Direct Buy) implemented
+- WhatsApp purchase flow
+- Uses ImageSlider
+- PurchaseForm opens inside card
+- Affiliate-ready but not heavily enabled before AdSense
+
+6. JEWELLERY PAGE
+- Direct Buy + Partner Picks supported
+- PartnerPicks component handles switching
+- JewelleryCard component
+- Fully responsive grid
+- Isolated CSS
+
+7. BOOKS
+- Database + admin CRUD ready
+- Affiliate-ready for future
+- Not heavily promoted before AdSense approval
+
+8. IMAGE SLIDER (IMPORTANT)
+- Custom ImageSlider component
+- Features:
+  - Shows arrows only if images.length > 1
+  - Arrows positioned over image
+  - Fast response (onMouseDown + requestAnimationFrame lock)
+  - Mobile-friendly button positioning
+  - Performance optimized (will-change, touch-action)
+  - Fully isolated CSS
+  - Responsive sizes for mobile / tablet / desktop
+- No arrows shown for single image (best UX)
+
+9. PURCHASE FORM (WhatsApp Order)
+- Opens as overlay inside card
+- Mandatory fields enforced:
+  - Name (required)
+  - Phone (required, 10 digits)
+  - Address (required)
+- Submit disabled until valid
+- Native HTML validation + JS validation
+- WhatsApp message auto-generated
+- Responsive modal
+- Isolated CSS
+
+10. ADMIN PANEL
+- Admin login
+- Sidebar navigation
+- CRUD for:
+  - Jobs
+  - Government jobs
+  - Dresses
+  - Jewellery
+  - Books
+- Admin UI uses dark theme
+- Public UI was aligned to match admin theme
+
+DATABASE STATUS
+- Tables created for:
+  - jobs
+  - govt_jobs
+  - dresses
+  - dress_images
+  - jewellery
+  - jewellery_images
+  - books
+  - book_images
+  - feedback
+- Affiliate-ready fields added:
+  - type (direct / partner)
+  - affiliate_link
+- Images stored as URLs (not blobs)
+
+GOOGLE ADSENSE STRATEGY
+- AdSense approval FIRST
+- No aggressive ads before approval
+- Disclosure text included (mandatory)
+- Simple, clean UI preferred
+- Affiliate sections kept light initially
+- Auto Ads planned after approval
+
+CSS STRATEGY (VERY IMPORTANT)
+- No global selectors like .page, .grid, button, img
+- Every page uses unique wrapper classes:
+  - .jobs-page
+  - .gov-jobs-page
+  - .image-slider
+  - .app-footer
+  - etc.
+- Prevents CSS conflicts across pages
+- Mobile-first responsiveness
+
+WHAT IS PENDING
+- Deployment (frontend + backend)
+- SEO basics (title, meta description)
+- Final content review
+- Apply for Google AdSense
+- After approval:
+  - Enable ads
+  - Gradually expand affiliate content
+
+HOW YOU SHOULD HELP ME IN FUTURE
+- Always respect existing architecture
+- Do NOT suggest global CSS changes
+- Do NOT break AdSense compliance
+- Prefer isolated CSS and minimal changes
+- Focus on UX, performance, and safety
+``
+
+
+
+
+
+-- =========================================================
+-- DATABASE
+-- =========================================================
+CREATE DATABASE IF NOT EXISTS job_affiliate;
+USE job_affiliate;
+
+-- =========================================================
+-- PRIVATE JOBS
+-- =========================================================
+CREATE TABLE IF NOT EXISTS jobs (
+  id INT NOT NULL PRIMARY KEY,
+  title VARCHAR(255),
+  company VARCHAR(255),
+  description TEXT,
+  image_url TEXT,
+  apply_link TEXT,
+  job_type VARCHAR(50)
+);
+
+-- =========================================================
+-- GOVERNMENT JOBS
+-- =========================================================
+CREATE TABLE IF NOT EXISTS govt_jobs (
+  id INT NOT NULL PRIMARY KEY,
+  title VARCHAR(255),
+  department VARCHAR(255),
+  organization VARCHAR(255),
+  location VARCHAR(255),
+  qualification VARCHAR(255),
+  age_limit VARCHAR(100),
+  employment_type VARCHAR(100),
+  application_start DATE,
+  application_end DATE,
+  exam_date DATE,
+  salary VARCHAR(100),
+  description TEXT,
+  apply_link TEXT,
+  notification_pdf TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- =========================================================
+-- DRESSES (DIRECT BUY + AFFILIATE READY)
+-- =========================================================
+CREATE TABLE IF NOT EXISTS dresses (
+  id INT NOT NULL PRIMARY KEY,
+  name VARCHAR(255),
+  price DECIMAL(10,2),
+  description TEXT,
+  type ENUM('direct','partner') NOT NULL DEFAULT 'direct',
+  affiliate_link VARCHAR(2048)
+);
+
+CREATE TABLE IF NOT EXISTS dress_images (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  dress_id INT NOT NULL,
+  image_url TEXT,
+  FOREIGN KEY (dress_id) REFERENCES dresses(id) ON DELETE CASCADE
+);
+
+-- =========================================================
+-- JEWELLERY (DIRECT BUY + AFFILIATE READY)
+-- =========================================================
+CREATE TABLE IF NOT EXISTS jewellery (
+  id INT NOT NULL PRIMARY KEY,
+  name VARCHAR(255),
+  price DECIMAL(10,2),
+  description TEXT,
+  type ENUM('direct','partner') NOT NULL DEFAULT 'direct',
+  affiliate_link VARCHAR(2048)
+);
+
+CREATE TABLE IF NOT EXISTS jewellery_images (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  jewellery_id INT NOT NULL,
+  image_url TEXT,
+  FOREIGN KEY (jewellery_id) REFERENCES jewellery(id) ON DELETE CASCADE
+);
+
+-- =========================================================
+-- BOOKS (AFFILIATE READY)
+-- =========================================================
+CREATE TABLE IF NOT EXISTS books (
+  id INT NOT NULL PRIMARY KEY,
+  title VARCHAR(255),
+  price DECIMAL(10,2),
+  description TEXT,
+  type ENUM('direct','partner') NOT NULL DEFAULT 'direct',
+  affiliate_link VARCHAR(2048)
+);
+
+CREATE TABLE IF NOT EXISTS book_images (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  book_id INT NOT NULL,
+  image_url TEXT,
+  FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
+);
+
+-- =========================================================
+-- FEEDBACK
+-- =========================================================
+CREATE TABLE IF NOT EXISTS feedback (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  message TEXT
+);
+
+-- =========================================================
+-- OPTIONAL BUT RECOMMENDED INDEXES
+-- =========================================================
+CREATE INDEX IF NOT EXISTS idx_dresses_type ON dresses(type);
+CREATE INDEX IF NOT EXISTS idx_jewellery_type ON jewellery(type);
+CREATE INDEX IF NOT EXISTS idx_books_type ON books(type);
+
+ALTER TABLE dresses
+    -> MODIFY id INT NOT NULL AUTO_INCREMENT;
